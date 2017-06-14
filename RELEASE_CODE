@@ -1,8 +1,9 @@
-#修改此文件并Push后，应用服务器会自动更新最新代码；请确保更新前已完成线上Schema更新
+#修改此文件并Push后，应用服务器会自动更新最新代码；请确保更新前已完成线上 数据库Schema更新
 #  APP_VERSION    仅更新线上代码
 #  CACHE_VERSION  更新并清缓存
+#  CONSUMER_VERSION 重启队列 Consumer
 
-APP_VERSION: 138
-CACHE_VERSION: 139
-CONSUMER_VERSION: 122
+APP_VERSION: 0
+CACHE_VERSION: 0
+CONSUMER_VERSION: 0
 
