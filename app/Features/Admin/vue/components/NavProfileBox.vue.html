@@ -1,0 +1,58 @@
+<template>
+    <li class="dropdown user user-menu" v-if="user">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img :src="user.avatar_small" class="user-image" alt="User Image">
+            <span class="hidden-xs">{{user.name}}</span>
+        </a>
+        <ul class="dropdown-menu">
+            <!-- User image -->
+            <li class="user-header">
+                <img :src="user.avatar" class="img-circle" alt="User Avatar">
+
+                <p>
+                    {{user.name}} - {{user.role}}
+                    <small>上次登录 {{user.last_login}}</small>
+                </p>
+            </li>
+            <!-- Menu
+            <li class="user-body">
+                <div class="row">
+                    <div class="col-xs-4 text-center">
+                        <a href="#">Followers</a>
+                    </div>
+                    <div class="col-xs-4 text-center">
+                        <a href="#">Sales</a>
+                    </div>
+                    <div class="col-xs-4 text-center">
+                        <a href="#">Friends</a>
+                    </div>
+                </div>
+            </li>
+            Menu-->
+            <li class="user-footer">
+                <div class="pull-left">
+                    <a href="/admin/users/#/profile" class="btn btn-default btn-flat">个人资料</a>
+                </div>
+                <div class="pull-right">
+                    <a href="/admin/logout" class="btn btn-default btn-flat">退出登录</a>
+                </div>
+            </li>
+        </ul>
+    </li>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                'user': null
+            };
+        },
+
+        mounted() {
+            this.$on('update', () => {
+                this.user = this.$parent.user;
+            });
+        }
+    }
+</script>

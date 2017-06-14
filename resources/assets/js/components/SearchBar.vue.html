@@ -1,0 +1,128 @@
+<template>
+    <div :id.once="id" :class="classex">
+        <i class="sb-search fa fa-search"></i><input class="main-search" type="text" name="keyword" autocomplete="off" :placeholder="hintText" /><i class="sb-dropdown fa fa-chevron-circle-down"></i>
+        <ul class="sb-filters">
+        </ul>
+        <div class="advance-search">
+            <form action="#" method="get" class="form-horizontal">
+                <slot name="advance-form"></slot>
+            </form>
+            <slot name="footer-button"></slot>
+            <div class="advance-submit"><button type="button" class="btn btn-app-red btn-sm" @click="doSearch(true)" v-show="okText">搜索</button></div>
+        </div>
+    </div>
+</template>
+
+<style>
+    .sb-dropdown {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+
+    export default {
+        props: {
+            id: {
+                required: true,
+                type: String
+            },
+            hintText: {
+                type: String,
+                default: "输入关键字搜索"
+            },
+            okText: {
+                type: String,
+                default: '搜索'
+            },
+            moreText: {
+                type: String,
+                default: '更多搜索'
+            },
+            'uclass': String,
+            filterParser: {
+                type: Object,
+                default: () => {return {};}
+            }
+        },
+        mounted() {
+            $('input.main-search', this.$el).keyup((e) =>{
+                if (e.keyCode === 13) {
+                    this.doSearch(false);
+                }
+            });
+
+            const dropdown = $('.sb-dropdown', this.$el);
+            dropdown.click(() => {
+                if (dropdown.is('.fa-chevron-circle-down')) {
+                    $('.advance-search', this.$el).show();
+                    dropdown.removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up');
+                } else {
+                    $('.advance-search', this.$el).hide();
+                    dropdown.removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down');
+                }
+            });
+
+            $('.sb-search', this.$el).click(() => {
+                this.doSearch(false);
+            });
+
+            if (!$('.advance-search form', this.$el).text()) {
+                dropdown.hide();
+            }
+        },
+        computed: {
+            classex() {
+                return 'search-bar ' + (this.uclass || '');
+            }
+        },
+        methods: {
+            removeFilter(k) {
+                $(`.sb-filters li[data-filter-key=${k}]`, this.$el).remove();
+                $(`form *[name=${k}]`, this.$el).val('');
+                this.$emit('removeFilter', k);
+
+                var obj = $('.advance-search form', this.$el).serializeJSON();
+                obj.keyword = $('.main-search', this.$el).val();
+
+                this.$emit('search', {data: obj, advence:true});
+            },
+            doSearch(advenceSearch) {
+                $('.advance-search', this.$el).hide();
+                $('.sb-dropdown', this.$el).removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down');
+
+                var obj = $('.advance-search form', this.$el).serializeJSON();
+                obj.keyword = $('.main-search', this.$el).val();
+
+                const filters = $('.sb-filters', this.$el);
+                filters.empty();
+
+                _.each(obj, (v,k) => {
+                    if (!v) {
+                        return;
+                    }
+                    if (k == 'keyword') {
+                        return;
+                    }
+
+                    const id = $(`form *[name=${k}]`, this.$el).attr('id');
+                    var text = $(`form label[for=${id}]`, this.$el).text();
+                    text = !text ? '' : `${text}: `;
+
+                    if (this.filterParser[k]) {
+                        v = this.filterParser[k](v);
+                    }
+                    filters.append(`<li data-filter-key="${k}"><span class="filter-label">${text}</span><span class="filter-val">${v}</span><i>&#xf00d;</i></li>`);
+                });
+
+                const vm = this;
+                $('li', filters).click(function() {
+                    vm.removeFilter($(this).data('filter-key'));
+                });
+
+                this.$emit('search', {data: obj, advence:advenceSearch});
+            }
+        }
+    }
+</script>
+

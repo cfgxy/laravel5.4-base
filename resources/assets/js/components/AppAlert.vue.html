@@ -1,0 +1,222 @@
+<template>
+    <modal id="app-alert" ref="modal" :autoDismiss="autoDismiss" :okText="okText" :cancelText="cancelText" :defaultAction="defaultAction" :small="true" @ok="onOk" @cancel="onCancel">
+        <span slot="title">{{title}}</span>
+        <div slot="content" class="app-alert-content-wrapper">
+            <i :class="iconClass" v-show="icon"></i>
+            <div v-html="msg" class="app-alert-content"></div>
+        </div>
+    </modal>
+</template>
+<script>
+    var onConfirmOk = null;
+    var onConfirmCancel = null;
+
+    window.toastr = require('toastr');
+    window.toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "3000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
+    /**
+     * 弹出信息
+     * @param msg
+     * @param options
+     */
+    window.apptoast = function(msg, options) {
+        appalert(msg, _.defaultsDeep({}, options, {
+            toast: true
+        }));
+    };
+
+    /**
+     * 弹出提示
+     * @param msg
+     * @param options
+     */
+    window.appinfo = function(msg, options) {
+        appalert(msg, _.defaultsDeep({}, options, {
+            toast: true,
+            icon: 'info'
+        }));
+    };
+
+    /**
+     * 弹出警告
+     * @param msg
+     * @param options
+     */
+    window.appwarning = function(msg, options) {
+        appalert(msg, _.defaultsDeep({}, options, {
+            toast: true,
+            icon: 'warning'
+        }));
+    };
+
+    /**
+     * 提示错误
+     * @param msg
+     * @param options
+     */
+    window.apperror = function(msg, options) {
+        appalert(msg, _.defaultsDeep({}, options, {
+            toast: true,
+            icon: 'error'
+        }));
+    };
+
+    /**
+     * 提示成功
+     * @param msg
+     * @param options
+     */
+    window.appsuccess = function(msg, options) {
+        appalert(msg, _.defaultsDeep({}, options, {
+            toast: true,
+            icon: 'success'
+        }));
+    };
+
+    /**
+     * 弹出确认框
+     * @param msg
+     * @param options
+     * @param onCancel
+     */
+    window.appconfirm = function(msg, options, onCancel) {
+        var opts = _.defaultsDeep({toast: false}, jQuery.isFunction(options) ? {} : options, {
+            title: '提示',
+            autoDismiss: false,
+            okText: '确认',
+            cancelText: '取消',
+            icon: 'question-circle'
+        });
+
+        onConfirmOk = null;
+        onConfirmCancel = null;
+
+        if (jQuery.isFunction(options)) {
+            onConfirmOk = options;
+        }
+
+        if (!onConfirmOk && jQuery.isFunction(opts.onOk)) {
+            onConfirmOk = opts.onOk;
+        }
+
+        onConfirmCancel = onCancel;
+        if (!onConfirmCancel && jQuery.isFunction(opts.onCancel)) {
+            onConfirmCancel = opts.onCancel;
+        }
+
+        appalert(msg, opts);
+    };
+
+    /**
+     * 弹出信息的具体处理函数
+     * @param msg
+     * @param options
+     */
+    window.appalert = function(msg, options) {
+
+        if (!options) {
+            options = {};
+        }
+
+        if (!msg) {
+            msg = '';
+        }
+
+        //弹出信息的默认选项
+        var opts = _.defaultsDeep({}, options, {
+            title: '提示',
+            autoDismiss: false,
+            okText: '确定',
+            cancelText: '取消',
+            defaultAction: 'ok',
+            icon: 'exclamation-circle',
+            toast: false
+        });
+
+        if (!options.toast) {
+            app.$refs['app-alert'].$refs.modal.onOkCallback = null;
+            app.$refs['app-alert'].$refs.modal.onCancelCallback = null;
+        }
+
+        //根据信息的类型弹出信息
+        if (options.toast) {
+            opts.icon = _.includes(['info', 'success', 'error', 'warning'], opts.icon) ? opts.icon : 'none';
+
+            toastr[opts.icon == 'none' ? 'info' : opts.icon](msg, !_.has(options, 'title') ? '' : options.title, {
+                timeOut: (_.has(options, 'autoDismiss') ? opts.autoDismiss : 3) * 1000,
+                iconClass: `toast-${opts.icon}`
+            });
+        } else {
+            app.$refs['app-alert'].$emit('api.show', msg, opts);
+        }
+    };
+
+    export default {
+        data() {
+            /**
+             * 返回信息的内容
+             */
+            return {
+                title: '提示',
+                autoDismiss: false,
+                okText: '',
+                cancelText: '',
+                defaultAction: 'ok',
+                icon: '',
+                msg: '',
+                okCallback: null,
+                cancelCallback: null
+            };
+        },
+        computed: {
+            iconClass() {
+                return `app-alert-icon fa fa-${this.icon}`;
+            }
+        },
+        mounted() {
+            this.$on('api.show', (msg, options) => {
+                _.assign(this, options);
+
+                this.msg = msg;
+
+                $('#app-alert').modal('show');
+            });
+        },
+        methods: {
+            /**
+             * 确认
+             */
+            onOk() {
+                if (onConfirmOk) {
+                    onConfirmOk();
+                }
+            },
+
+            /**
+             * 取消
+             */
+            onCancel() {
+                if (onConfirmCancel) {
+                    onConfirmCancel();
+                }
+            }
+        }
+    }
+</script>
+

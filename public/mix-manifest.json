@@ -1,0 +1,13 @@
+{
+  "/js/admin/app.js": "/js/admin/app.js",
+  "/js/admin/login.js": "/js/admin/login.js",
+  "/js/admin/users.js": "/js/admin/users.js",
+  "/js/admin/tasks.js": "/js/admin/tasks.js",
+  "/js/admin/payments.js": "/js/admin/payments.js",
+  "/js/admin/merchants.js": "/js/admin/merchants.js",
+  "/js/admin/index.js": "/js/admin/index.js",
+  "/js/admin/apps.js": "/js/admin/apps.js",
+  "/mix.js": "/mix.js",
+  "/css/app.css": "/css/app.css",
+  "/css/admin/login.css": "/css/admin/login.css"
+}

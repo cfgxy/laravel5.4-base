@@ -1,0 +1,15 @@
+#!/bin/bash
+
+touch /var/www/storage/logs/laravel.log
+chmod a+rw /var/www/storage/logs/laravel.log
+
+if [[ "$APP_ROLE" == "queue_daemon" ]]; then
+    if [[ ! -f /root/.app_laravel_inited ]]; then
+        sudo -u www-data /var/www/artisan queue:listen --tries=1 redis &
+    else
+        sudo -u www-data /var/www/artisan queue:work --tries=1 redis &
+    fi
+
+#else
+#sudo -u www-data /var/www/artisan laravoole start
+fi

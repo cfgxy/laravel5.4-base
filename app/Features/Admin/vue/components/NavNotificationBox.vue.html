@@ -1,0 +1,54 @@
+<template>
+    <li class="dropdown notifications-menu" v-if="user">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click="onIconClick">
+            <i class="fa fa-bell-o"></i>
+            <span class="label label-warning" v-if="notifications.nums">{{notifications.nums}}</span>
+        </a>
+        <ul class="dropdown-menu">
+            <li class="header">您有 {{notifications.nums}} 条提醒</li>
+            <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu">
+                    <li v-for="item in notifications.data">
+                        <a :href="`/admin/users/#/notifications/${item.id}`">
+                            <i :class="`fa ${item.icon}`"></i> {{item.text}}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="footer"><a href="/admin/users/#/notifications"> 查看全部 </a></li>
+        </ul>
+    </li>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                'user': null
+            };
+        },
+
+        mounted() {
+            this.$on('update', () => {
+                this.user = this.$parent.user;
+            });
+        },
+
+        methods: {
+            onIconClick(e) {
+                if (!this.notifications.nums) {
+                    $('[data-toggle="dropdown"]', this.$el).dropdown('toggle');
+                    location.href = '/admin/users/#/notifications';
+                }
+                return false;
+            }
+        },
+
+        computed: {
+            notifications() {
+                return this.user.notifications;
+            }
+        }
+    }
+</script>

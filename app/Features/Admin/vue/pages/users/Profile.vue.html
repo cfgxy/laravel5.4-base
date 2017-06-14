@@ -1,0 +1,121 @@
+<template>
+    <panel>
+
+        <span slot="title">
+             个人信息
+        </span>
+
+        <div slot="body">
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="box box-primary">
+                        <!-- /.box-header -->
+                        <!-- form start -->
+                        <form name="users.updation" data-toggle="jsvalidator">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label class="control-label">头像</label>
+                                    <avatar-uploader name="avatar" ref="uploader" @uploaded="onUploaded"></avatar-uploader>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="users-updation-name">姓名</label>
+                                    <input class="form-control" id="users-updation-name" name="name" type="text" placeholder="输入姓名" v-model="model.name" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="users-updation-email">邮箱</label>
+                                    <input class="form-control" id="users-updation-email" name="email" type="email" placeholder="输入邮箱用于找回密码" v-model="model.email" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="users-updation-password">密码(留空表示不修改)</label>
+                                    <input class="form-control" id="users-updation-password" name="password" type="password" placeholder="输入密码" v-model="model.password"  />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="users-updation-password_confirmation">确认</label>
+                                    <input class="form-control" id="users-updation-password_confirmation" name="password_confirmation" type="password" placeholder="重复输入密码字段以确认" v-model="model.password_confirmation" />
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-primary pull-right">更新</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </panel>
+
+</template>
+
+<script>
+
+    export default {
+        components: {
+            'avatar-uploader': require('./AvatarUploader.vue.html')
+        },
+        data() {
+            return {
+                model: {},
+                original: {},
+                breadcrum: [
+                    appDashboardBreadcrumItem,
+                    makeAppBreadcrum('个人信息', '/admin/users/#/profile', 'fa-user-circle')
+                ]
+            }
+        },
+        methods: {
+            onUploaded() {
+                this.model.avatar_ver = Math.floor(_.now() / 1000);
+            }
+        },
+        mounted() {
+            const vm = this;
+
+            axios.get('./profile').then((ret) => {
+                const msg = ret.data;
+                if (msg.code === 0) {
+                    this.original = _.cloneDeep(msg.data);
+                    this.model = msg.data;
+                    vm.$refs.uploader.preview(!this.model.has_avatar ? '' : this.model.avatar)
+                }
+            });
+
+
+            $('form[name="users.updation"]', this.$el).on('jsvalidator.ok', function() {
+
+
+                let obj = dataDiff(vm.model, vm.original);
+
+                if (!obj.password) {
+                    delete obj.password;
+                }
+
+                axios.put('./profile', obj).then((ret) => {
+                    const msg = ret.data;
+
+                    if (msg.code === 422) {
+                        $.addErrorStates(this, msg.data.errors);
+                        return apperror(msg.msg);
+                    } else if (msg.code > 0) {
+                        return apperror(msg.msg);
+                    }
+
+                    delete vm.model.password;
+                    delete vm.model.password_confirmation;
+                    vm.original = _.cloneDeep(vm.model);
+                    vm.$forceUpdate();
+
+                    app.$refs.navbar.$emit('update');
+                    return appsuccess("更新成功");
+                });
+            });
+
+        }
+    }
+</script>

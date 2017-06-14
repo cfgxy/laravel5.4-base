@@ -1,0 +1,65 @@
+<template>
+    <li class="dropdown tasks-menu" v-if="user">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click="onIconClick">
+            <i class="fa fa-flag-o"></i>
+            <span class="label label-danger" v-if="tasks.nums">{{tasks.nums}}</span>
+        </a>
+        <ul class="dropdown-menu">
+            <li class="header">{{tasks.nums}} 个任务正在执行</li>
+            <li>
+                <ul class="menu">
+                    <li v-for="item in tasks.data">
+                        <a :href="`/admin/users/#/tasks/${item.id}`">
+                            <h3>
+                                {{item.name}}
+                                <small class="pull-right">{{item.percent}}%</small>
+                            </h3>
+                            <div class="progress xs">
+                                <div class="progress-bar progress-bar-aqua" style="width: 20%"
+                                     role="progressbar" :aria-valuenow="item.percent" aria-valuemin="0"
+                                     aria-valuemax="100">
+                                    <span class="sr-only">已完成 {{item.percent}}%</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="footer">
+                <a href="/admin/users/#/tasks"> 查看全部 </a>
+            </li>
+        </ul>
+    </li>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                'user': null
+            };
+        },
+
+        mounted() {
+            this.$on('update', () => {
+                this.user = this.$parent.user;
+            });
+        },
+
+        methods: {
+            onIconClick(e) {
+                if (!this.tasks.nums) {
+                    $('[data-toggle="dropdown"]', this.$el).dropdown('toggle');
+                    location.href = '/admin/users/#/tasks';
+                }
+                return false;
+            }
+        },
+
+        computed: {
+            tasks() {
+                return this.user.tasks;
+            }
+        }
+    }
+</script>

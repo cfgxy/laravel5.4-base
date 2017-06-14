@@ -1,0 +1,234 @@
+<template>
+    <!-- 模态框（Modal） -->
+    <div :id.once="id" :class="classex" tabindex="-1" role="dialog">
+        <div :class.once="dialogclasses">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <slot name="header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            <slot name="title">Title</slot>
+                        </h4>
+                    </slot>
+                </div>
+                <div class="modal-body">
+                    <slot name="content"></slot>
+                </div>
+                <div class="modal-footer" v-show="modalFooterShouldShow">
+                    <slot name="footer">
+                        <slot name="left-button"></slot>
+                        <button type="button" class="btn btn-app-large btn-sm app-modal-default-ok" v-show="okText">{{dymOkText}}</button>
+                        <slot name="middle-button"></slot>
+                        <button type="button" class="btn btn-app-large btn-sm app-modal-default-cancel" v-show="cancelText" data-dismiss="modal">{{dymCancelText}}</button>
+                        <slot name="right-button"></slot>
+                    </slot>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</template>
+<script>
+    export default {
+        /**
+         * 模态框的属性设置
+         */
+        props: {
+            id: {
+                required: true,
+                type: String
+            },
+            'uclass': {
+                type: String
+            },
+            'small': Boolean,
+            'large': Boolean,
+            'full': Boolean,
+            dismissWhenOK: {
+                type: Boolean,
+                default: true
+            },
+            okIsSubmit: {
+                type: Boolean,
+                default: false
+            },
+            footerAlwaysShow: {
+                type: Boolean,
+                default: false
+            },
+            okText: {
+                type: String,
+                default: '确定'
+            },
+            cancelText: {
+                type: String,
+                default: '取消'
+            },
+            autoDismiss: {
+                type: [Boolean, Number],
+                default: false
+            },
+            defaultAction: {
+                validator: (v) => _.includes(['ok', 'cancel'], v),
+                type: String,
+                default: 'ok'
+            }
+        },
+        data() {
+            return {
+                timeLeft: 0
+            };
+        },
+        mounted() {
+            const vm = this;
+
+            if (this.dismissWhenOK) {
+                $('.app-modal-default-ok,[role=modal-ok]', this.$el).attr('data-dismiss', 'modal');
+            }
+
+            /**
+             * 表单数据的重置与验证
+             */
+            $('form[data-toggle="jsvalidator"]', this.$el).on('jsvalidator.ok', function() {
+                vm.$emit('submit', this);
+            });
+            $('form', this.$el).not('[data-toggle="jsvalidator"]').on('submit', function() {
+                vm.$emit('submit', this);
+                return false;
+            });
+
+            //在调用show方法后触发
+            let it = 0;
+            let showTimes = 0;
+            $(this.$el).on('show.bs.modal', () => {
+                $('form', this.$el).each(function() {
+                    this.reset();
+                    $('.form-group', this).removeClass('has-error').removeClass('has-success');
+                });
+
+                if (showTimes === 0) {
+                    this.$emit('ready');
+                }
+
+                showTimes++;
+                this.$emit('show');
+            });
+
+            //当模态框对用户可见时触发
+            $(this.$el).on('shown.bs.modal', () => {
+                if (this.autoDismiss) {
+                    this.timeLeft = _.toInteger(this.autoDismiss);
+
+                    it = setInterval(() => {
+                        this.timeLeft--;
+
+                        if (this.timeLeft <= 0) {
+                            $(this.$el).modal('hide');
+                            this.timeLeft = 0;
+                        }
+                    }, 1000);
+                }
+            });
+
+            //当调用hide方法时触发
+            $(this.$el).on('hide.bs.modal', () => {
+                if (it) {
+                    clearInterval(it);
+                    it = 0;
+                }
+                this.$emit('hide');
+            });
+
+            //点击确认按钮提交
+            $('.app-modal-default-ok,[role=modal-ok]', this.$el).click(() => {
+                if (this.okIsSubmit) {
+                    $('form:visible', this.$el).submit();
+                }
+                this.$emit('ok');
+            });
+
+            //点击关闭按钮关闭
+            $('.app-modal-default-cancel,[role=modal-cancel]', this.$el).click(() => {
+                this.$emit('cancel');
+            });
+        },
+        computed: {
+            modalFooterShouldShow() {
+                return this.okText || this.cancelText || this.footerAlwaysShow;
+            },
+            classex() {
+                let cls = 'modal fade ';
+
+                if (this.full) {
+                    cls += 'modal-full ';
+                }
+
+                if (!this.modalFooterShouldShow) {
+                    cls += 'modal-nofooter '
+                }
+
+                if (this.uclass) {
+                    cls += this.uclass;
+                }
+
+                return cls;
+            },
+            dialogclasses() {
+                let cls = 'modal-dialog ';
+                if (this.small) {
+                    cls += 'modal-sm ';
+                }
+                if (this.large) {
+                    cls += 'modal-lg ';
+                }
+                return cls;
+            },
+            dymOkText() {
+                if (!this.autoDismiss) {
+                    return this.okText;
+                }
+
+                if (this.defaultAction === 'cancel') {
+                    return this.okText;
+                }
+
+                if (this.timeLeft === 0) {
+                    return this.okText;
+                }
+
+                return `${this.okText} (${this.timeLeft})`;
+            },
+            dymCancelText() {
+                if (!this.autoDismiss) {
+                    return this.cancelText;
+                }
+
+                if (this.defaultAction === 'ok') {
+                    return this.cancelText;
+                }
+
+                if (this.timeLeft === 0) {
+                    return this.okText;
+                }
+
+                return `${this.cancelText} (${this.timeLeft})`;
+            }
+        },
+        methods: {
+            /**
+             * 显示模态框
+             */
+            show() {
+                $(this.$el).modal('show');
+            },
+            /**
+             * 隐藏模态框
+             */
+            hide() {
+                $(this.$el).modal('hide');
+            }
+        }
+    }
+</script>
+

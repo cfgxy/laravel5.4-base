@@ -1,0 +1,51 @@
+.avatar-uploader {
+  height: 200px;
+  width: 200px;
+  padding: 0;
+  overflow: hidden;
+
+  .qq-drop-processing {
+    display: none;
+  }
+
+  &:before {
+    top: 40%;
+  }
+
+  .qq-upload-button {
+    background: #333333;
+    opacity: 0.6;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    margin-top: 162px;
+  }
+
+  .qq-upload-list {
+    display: none;
+  }
+
+  .qq-total-progress-bar-container {
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .qq-progress-bar {
+    height: 3px;
+    border-radius: 0;
+  }
+
+  .main-preview {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 200px;
+
+  }
+}

@@ -1,0 +1,80 @@
+laravel: &phprunner
+  restart: always
+  build: .
+  # image: registry-internal.cn-hangzhou.aliyuncs.com/xxx/xxx    #线上部署时，换成 『阿里云容器服务』的私有镜像地址
+  # extra_hosts:                                                 #如有需要可在此处定义容器内的/etc/hosts 内容
+  #   - "rabbitmq:111.111.111.111"
+  ports:
+    - 80:80
+
+  # $PWD:/var/www  挂载仅在开发时用，线上部署时，请不要挂载 任何文件系统到 /var/www 下 (包括子目录); 
+  # 容器初次启动时，源码会通过下面定义的APP_GIT_URL，自动 PULL 下来, 任何挂载到/var/www 下的文件系统都会被清空
+  # 注意：不要在 /var/www 下存储持久化内容； 容器内整个 / 根目录都是容器文件系统，容器间文件互不共享。持久化内容请挂载『数据卷』来存储
+
+  # volumes:                                        
+  #   - uploads:/data/uploads                        #此处 uploads 表示阿里容器服务中『数据卷』的卷名
+  volumes:
+    - $PWD:/var/www
+  links:
+    - redis-server:redis-server
+    - mysql:mysql
+  labels:
+    aliyun.scale: "3"                                #启动多少个这样的容器；用于集群容灾和负载均衡。线上部署时，如果硬件配置允许，建议设置成>=2
+    aliyun.routing.port_80: 'http://xxx.xxx.com/'    #部署的域名+路径, 允许将不同的地址映射到不同的容器上；理论上支持不同架构基于路径的混合部署。
+    aliyun.log_store_accesslog: /var/log/nginx.log               #如果容器集群开启了日志服务，可以将容器内的日志文件转发到阿里云商用『日志服务』里
+    aliyun.log_store_laravel: /var/www/storage/logs/laravel.log  #同上，log_store_accesslog/log_store_laravel 分别定义了  accesslog/laravel 两个日志入口；可以按此规则定义更多
+    aliyun.probe.url: http://container/alive.php     #检测服务是否可用的地址(HTTP_CODE=200说明可用)，域名必须是 『container』; 此地址用于后端健康检查
+    aliyun.probe.initial_delay_seconds: "30"         #第一次健康检查延迟多长时间执行(服务初次启动可能有一系列的初始化操作，耗时较长)
+    aliyun.rolling_updates: 'true'                   #开启滚动更新;  可实现不停服的情况下，更新容器配置(如 软件版本升级)
+    aliyun.rolling_updates.parallelism: "2"          #滚动更新时，每轮更新多少个容器; 实际应用中，应根据 aliyun.scale 做相应调整；例子中的配置意思是：
+                                                     #  一共有三个容器，每轮更新2个，等新的容器健康检查通过后，再执行下一轮更新(1个)
+    #更多标签，参考文档:  https://help.aliyun.com/document_detail/26086.html?spm=5176.doc26085.6.588.LrzrFN
+
+  environment: &phprunner-env
+    APP_GIT_URL: git:cfgxy/laravel.git               #远端访问的 git 库地址
+    APP_INIT_SCRIPT: /usr/local/bin/app_init         #项目初始化脚本(如数据卷 /data/uploads 软连接到项目目录，要自己改app_init脚本)
+    APP_START_SCRIPT: /var/www/docker/app_start      #项目启动脚本
+    PUBLISH_SSH_KEY: &PUBLISH_SSH_KEY |
+      -----BEGIN RSA PRIVATE KEY-----
+      换成部署私钥
+      并保持这种缩进模式
+      -----END RSA PRIVATE KEY-----
+
+qdaemon:
+  <<: *phprunner
+  ports: []
+  labels:
+    aliyun.routing.port_80: 'http://localhost'       #QDaemon 服务不对外提供服务，但是要覆盖掉 laravel 服务中定义的字段
+  environment:
+    <<: *phprunner-env
+    APP_ROLE: queue_daemon
+
+redis-server:
+  restart: always
+  image: hub.c.163.com/library/redis:alpine
+  ports:
+    - 6379:6379
+
+mysql:
+  restart: always
+  image: hub.c.163.com/library/mysql:5.7
+  ports:
+    - 3306:3306
+  volumes:
+    - $PWD:/var/www
+  environment:
+    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    - MYSQL_DATABASE=laravel
+
+# 线上部署时，如果使用的是阿里云的商用服务 服务要定义成虚容器
+# redis-server:
+#   external:
+#     host: r-bpxxx.redis.rds.aliyuncs.com
+#     ports:
+#       - 6379
+# mysql:
+#   external:
+#     host: rm-bpxxx.mysql.rds.aliyuncs.com
+#     ports:
+#       - 3306
+

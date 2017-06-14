@@ -1,0 +1,35 @@
+#!/bin/bash
+
+if [[ ! -f /root/.app_laravel_inited ]]; then
+  exit
+fi
+
+cd /var/www
+git fetch
+NEED_RELEASE=$(git diff master origin/master RELEASE_CODE|wc -l)
+NEED_CC=$(git diff master origin/master RELEASE_CODE|grep +CACHE_VERSION:|wc -l)
+NEED_CONSUMER_RESTART=$(git diff master origin/master RELEASE_CODE|grep +CONSUMER_VERSION:|wc -l)
+
+if [[ $NEED_RELEASE -lt 1 ]]; then
+  echo 'No need release.';
+  exit
+fi
+
+git pull
+cp .env.prod .env
+
+
+if [[ $NEED_CC -gt 0 ]]; then
+  ./artisan config:cache 
+  ./artisan route:cache  
+  ./artisan optimize
+fi
+
+#./artisan laravoole reload
+
+if [[ $NEED_CONSUMER_RESTART -gt 0 ]]; then
+  if [[ "$APP_ROLE" == "queue_daemon" ]]; then
+    ./artisan queue:restart
+    sudo -u www-data ./artisan queue:work --tries=1 redis &
+  fi
+fi

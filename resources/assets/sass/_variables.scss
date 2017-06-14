@@ -1,0 +1,62 @@
+// Body
+$body-bg: #f5f8fa;
+
+// Borders
+$laravel-border-color: darken($body-bg, 10%);
+$list-group-border: $laravel-border-color;
+$navbar-default-border: $laravel-border-color;
+$panel-default-border: $laravel-border-color;
+$panel-inner-border: $laravel-border-color;
+
+// Brands
+$brand-primary: #3097D1;
+$brand-info: #8eb4cb;
+$brand-success: #2ab27b;
+$brand-warning: #cbb956;
+$brand-danger:  #bf5329;
+
+// Typography
+$font-family-sans-serif: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+$font-size-base: 14px;
+$line-height-base: 1.6;
+$text-color: #636b6f;
+
+$app-text-color-main: #363636;
+
+
+// Colors
+$app-color-white: white;
+$app-color-red: #e84248;
+
+$app-color-orange: #F6692C;
+$app-color-yellow: #FFBB00;
+
+$app-light-blue: #63aee2;
+$app-color-blue: #4e8bd0;
+$app-color-dark-blue: #2d7ccd;
+
+$app-color-gray: #b8b8b8;
+$app-color-light-gray: #dddddd;
+$app-color-lighter-gray: #f1f1f1;
+$app-color-dark-gray: #aaaaaa;
+
+// Navbar
+$navbar-default-bg: #fff;
+
+// Buttons
+$btn-default-color: $text-color;
+
+// Inputs
+$input-border: lighten($text-color, 40%);
+$input-border-focus: lighten($brand-primary, 25%);
+$input-color-placeholder: lighten($text-color, 30%);
+$input-height-base: 30px;
+$padding-base-vertical: 3px;
+$padding-base-horizontal: 6px;
+$form-group-margin-bottom: 8px;
+
+// Panels
+$panel-default-heading-bg: #fff;
+
+// Modal
+$modal-sm: 400px;

@@ -1,0 +1,50 @@
+<template>
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <slot name="head">
+                <h1>
+                    <slot name="title">
+                        Replace this with {title} slot.
+                    </slot>
+                </h1>
+                <ol class="breadcrumb">
+                    <slot name="breadcrumb">
+                        <li v-for="item in breadcrum">
+                            <a :href="item.url" v-if="item.url"><i :class="'fa ' + item.icon" v-if="item.icon"></i> {{item.name}}</a>
+                            <span v-else><i :class="'fa ' + item.icon" v-if="item.icon"></i> {{item.name}}</span>
+                        </li>
+                    </slot>
+                </ol>
+            </slot>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <slot name="body">
+                Replace this with {body} slot.
+            </slot>
+        </section>
+        <!-- /.content -->
+
+
+        <slot name="extras">
+        </slot>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                breadcrum: []
+            };
+        },
+
+        mounted() {
+            if (this.$parent && this.$parent.breadcrum) {
+                this.breadcrum = this.$parent.breadcrum;
+            }
+        }
+    }
+</script>

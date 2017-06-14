@@ -1,0 +1,61 @@
+<template>
+    <li class="dropdown messages-menu" v-if="user">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click="onIconClick">
+            <i class="fa fa-envelope-o"></i>
+            <span class="label label-success" v-if="messages.nums">{{messages.nums}}</span>
+        </a>
+        <ul class="dropdown-menu">
+            <li class="header"> 您有 {{messages.nums}} 条未读消息 </li>
+            <li>
+                <ul class="menu">
+                    <li v-for="item in messages.data">
+                        <a :href="`/admin/users/#/messages/${item.id}`">
+                            <div class="pull-left">
+                                <img :src="item.user.avatar" class="img-circle"
+                                     alt="User Image">
+                            </div>
+                            <h4>
+                                {{item.user.name}}
+                                <small><i class="fa fa-clock-o"></i> 5 mins</small>
+                            </h4>
+                            <p>{{item.text}}</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="footer"><a href="/admin/users/#/messages">查看全部</a></li>
+        </ul>
+    </li>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                'user': null
+            };
+        },
+
+        mounted() {
+            this.$on('update', () => {
+                this.user = this.$parent.user;
+            });
+        },
+
+        methods: {
+            onIconClick(e) {
+                if (!this.messages.nums) {
+                    $('[data-toggle="dropdown"]', this.$el).dropdown('toggle');
+                    location.href = '/admin/users/#/messages';
+                }
+                return false;
+            }
+        },
+
+        computed: {
+            messages() {
+                return this.user.messages;
+            }
+        }
+    }
+</script>

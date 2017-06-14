@@ -1,0 +1,70 @@
+#!/bin/bash
+NSERVICE=laravel
+PROD_DOCKER_HOST=tcp://master4g5.cs-cn-hangzhou.aliyun.com:1092
+PROD_DOCKER_CERT_PATH=$HOME/.ssh/docker/laravel
+
+if [[ "$1" == "push" ]]; then
+  docker tag "laravel_laravel" registry.cn-hangzhou.aliyuncs.com/xxx/xxx:latest
+  docker push registry.cn-hangzhou.aliyuncs.com/xxx/xxx:latest
+  exit
+fi
+
+if [[ "$1" == "pull" ]]; then
+  docker pull registry.cn-hangzhou.aliyuncs.com/guxy/phprunner
+  exit
+fi
+
+if [[ "$1" == "--prod" ]]; then
+  if [[ "$2" =~ ^(shell|attach|inspect|port|stats|top|ps)$ ]]; then
+    SH=$4
+    if [[ "$SH" == "" ]]; then
+      SH=/bin/bash
+    fi
+    CT=$3
+    if [[ "$CT" == "" ]]; then
+      CT=laravel
+    fi
+
+    if [[ "$CT" =~ _[0-9]+$ ]]; then
+      echo
+    else
+      CT=${CT}_1
+    fi
+
+    if [[ "$2" == "shell" ]]; then
+      DOCKER_TLS_VERIFY="1" DOCKER_CERT_PATH="$PROD_DOCKER_CERT_PATH" DOCKER_HOST="$PROD_DOCKER_HOST" docker exec -ti ${NSERVICE}_${CT} $SH
+    elif [[ "$2" == "ps" ]]; then
+      DOCKER_TLS_VERIFY="1" DOCKER_CERT_PATH="$PROD_DOCKER_CERT_PATH" DOCKER_HOST="$PROD_DOCKER_HOST" docker ps $3
+    elif [[ "$2" =~ ^(attach|inspect|port|stats|top)$ ]]; then
+      DOCKER_TLS_VERIFY="1" DOCKER_CERT_PATH="$PROD_DOCKER_CERT_PATH" DOCKER_HOST="$PROD_DOCKER_HOST" docker $2 ${NSERVICE}_${CT}
+    fi
+    exit
+  fi
+else
+  if [[ "$1" =~ ^(shell|attach|inspect|port|stats|top)$ ]]; then
+    SH=$3
+    if [[ "$SH" == "" ]]; then
+      SH=/bin/bash
+    fi
+    CT=$2
+    if [[ "$CT" == "" ]]; then
+      CT=laravel
+    fi
+
+    if [[ "$CT" =~ _[0-9]+$ ]]; then
+      echo
+    else
+      CT=${CT}_1
+    fi
+  
+    if [[ "$1" == "shell" ]]; then
+      docker exec -ti ${NSERVICE}_${CT} $SH
+    elif [[ "$1" =~ ^(attach|inspect|port|stats|top)$ ]]; then
+      docker $1 ${NSERVICE}_${CT}
+    fi
+    exit
+  fi
+fi
+
+docker-compose -p $NSERVICE -f docker/docker-compose.yml $*
+

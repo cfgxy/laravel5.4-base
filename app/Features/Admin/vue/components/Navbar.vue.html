@@ -1,0 +1,44 @@
+<template>
+    <ul class="nav navbar-nav">
+        <nav-message-box ref="messages"></nav-message-box>
+        <nav-notification-box ref="notifications"></nav-notification-box>
+        <nav-task-box ref="tasks"></nav-task-box>
+        <nav-profile-box ref="profile"></nav-profile-box>
+    </ul>
+</template>
+
+<script>
+    export default {
+        components: {
+            "nav-message-box": require('./NavMessageBox.vue.html'),
+            "nav-task-box": require('./NavTaskBox.vue.html'),
+            "nav-notification-box": require('./NavNotificationBox.vue.html'),
+            "nav-profile-box": require('./NavProfileBox.vue.html')
+        },
+
+        data() {
+            return {
+                'user': null
+            };
+        },
+
+        mounted() {
+            this.$on('update', () => {
+                axios.get('/admin/user_info').then((ret) => {
+                    const msg = ret.data;
+                    if (msg.code === 0) {
+                        this.user = msg.data;
+
+                        this.$refs.messages.$emit('update');
+                        this.$refs.notifications.$emit('update');
+                        this.$refs.tasks.$emit('update');
+                        this.$refs.profile.$emit('update');
+                    }
+                });
+            });
+
+
+            this.$emit('update');
+        }
+    }
+</script>

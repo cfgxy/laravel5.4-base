@@ -1,0 +1,239 @@
+<template>
+    <panel>
+
+        <span slot="title">
+             用户管理
+        </span>
+
+        <div slot="body">
+            <div class="row">
+                <div class="col-md-5">
+                    <h4 class="guxy-title">
+                        <button type="button" class="btn btn-app-mid btn-app-red btn-sm" data-toggle="modal" data-target="#users-creation">新增</button>
+                        <span class="dropdown">
+                        <button type="button" class="btn btn-app-mid btn-app-white btn-sm" data-toggle="dropdown">更多 <i class="fa fa-chevron-circle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a @click="onEdit">修改</a></li>
+                            <li><a @click="onDelete">删除</a></li>
+                            <!--
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-submenu">
+                                <a tabindex="-1">更多功能</a>
+                                <ul class="dropdown-menu">
+                                    <li><a role="button"  @click="onToggleShowAll">{{showAll ? '隐藏' : '显示'}}停用</a></li>
+                                </ul>
+                            </li>
+                            -->
+                        </ul>
+                    </span>
+                    </h4>
+                </div>
+                <div class="col-md-5 pull-right">
+                    <search-bar id="searchbar1" class="mt5" @search="onSearch">
+                    </search-bar>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <flex-table id="sample" :dataSource="ds" height="450px" ref="grid"></flex-table>
+                </div>
+            </div>
+        </div>
+
+
+        <div slot="extras">
+            <modal id="users-creation" ref="modal-users-creation" :small="true" @submit="onCreationSubmit" :dismissWhenOK="false" :okIsSubmit="true">
+                <span slot="title">新增用户</span>
+                <div slot="content" class="app-alert-content-wrapper">
+                    <form name="users.creation" class="form-horizontal" data-toggle="jsvalidator">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-name">姓名</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-creation-name" name="name" type="text" placeholder="输入姓名" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-email">邮箱</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-creation-email" name="email" type="email" placeholder="输入邮箱用于找回密码" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-role">角色</label>
+                            <div class="col-sm-8">
+                                <select id="users-creation-role" name="role" class="form-control">
+                                    <option v-for="(role, key) in extras.roles" :value="key">{{role}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-password">密码</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-creation-password" name="password" type="password" placeholder="输入密码" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-password_confirmation">确认</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-creation-password_confirmation" name="password_confirmation" type="password" placeholder="重复输入密码字段以确认" /></div>
+                        </div>
+                    </form>
+                </div>
+            </modal>
+
+            <modal id="users-updation" ref="modal-users-updation" :small="true" @show="onUpdationShow" @submit="onUpdationSubmit" :dismissWhenOK="false" :okIsSubmit="true">
+                <span slot="title">修改用户信息</span>
+                <div slot="content" class="app-alert-content-wrapper">
+                    <form name="users.updation" class="form-horizontal" data-toggle="jsvalidator">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-updation-name">姓名</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-updation-name" name="name" type="text" placeholder="输入姓名" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-updation-email">邮箱</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-updation-email" name="email" type="email" placeholder="输入邮箱用于找回密码" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-creation-role">角色</label>
+                            <div class="col-sm-8">
+                                <select id="users-updation-role" name="role" class="form-control">
+                                    <option v-for="(role, key) in extras.roles" :value="key">{{role}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-updation-password">密码(留空表示不修改)</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-updation-password" name="password" type="password" placeholder="输入密码" /></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="users-updation-password_confirmation">确认</label>
+                            <div class="col-sm-8"><input class="form-control" id="users-updation-password_confirmation" name="password_confirmation" type="password" placeholder="重复输入密码字段以确认" /></div>
+                        </div>
+                    </form>
+                </div>
+            </modal>
+        </div>
+    </panel>
+
+</template>
+
+<script>
+
+    export default {
+        data() {
+            return {
+                ds: new APIPagerDatasource('./data', [
+                    {headerName: "姓名", field: "name", suppressSorting: false, vis: true},
+                    {headerName: "角色", field: "role", suppressSorting: false, vis: true, cellRenderer: (params) => {
+                        return this.extras.roles[params.value];
+                    }},
+                    {headerName: "邮箱", field: "email", suppressSorting: false, vis: true},
+                    {headerName: "创建日期", field: "created_at", vis: true}
+                ]).ajaxData((data) => {
+                    return _.defaults({show_all: this.showAll}, data, this.searchParams)
+                }).success((ret) => {
+                    this.extras = ret.data.extras;
+                }),
+                searchParams: {},
+                showAll: false,
+                currentRow: {},
+                extras: {},
+                breadcrum: [
+                    appDashboardBreadcrumItem,
+                    makeAppBreadcrum('用户管理', '/admin/users/#/', 'fa-user')
+                ]
+            }
+        },
+        methods: {
+            onSearch(params) {
+                this.searchParams = params.data;
+                this.$refs.grid.pager.loadPage();
+            },
+            onEdit() {
+                const rows = this.$refs.grid.api.getSelectedNodes();
+
+                if (!rows.length) {
+                    apptoast('请勾选需要编辑的项');
+                    return;
+                }
+
+                this.currentRow = rows[0].data;
+
+                if (rows.length > 1) {
+                    rows[0].setSelected(true, true);
+                }
+
+                this.$refs['modal-users-updation'].show();
+            },
+            onDelete() {
+                const ids = _.map(this.$refs.grid.api.getSelectedRows(), 'id');
+                if (!ids.length) {
+                    apptoast('请勾选需要删除的项');
+                    return;
+                }
+
+                appconfirm(`将要删除${ids.length}条记录,是否继续?`, () => {
+                    axios.delete('./data/selected', {
+                        'params': {ids}
+                    }).then((ret) => {
+                        const msg = ret.data;
+
+                        if (msg.code > 0) {
+                            apperror(msg.msg);
+                            return;
+                        } else {
+                            appsuccess(msg.msg);
+                        }
+                        this.$refs.grid.api.deselectAll();
+                        this.$refs.grid.pager.loadPage();
+                    });
+                });
+            },
+            onCreationSubmit(form) {
+                const obj = $(form).serializeJSON();
+
+                axios.post('./data', obj).then((ret) => {
+                    const msg = ret.data;
+
+
+                    if (msg.code === 422) {
+                        $.addErrorStates(form, msg.data.errors);
+                        return apperror(msg.msg);
+                    } else if (msg.code > 0) {
+                        return apperror(msg.msg);
+                    }
+
+                    //表格内容更新，弹出框隐藏
+                    this.$refs.grid.pager.loadPage();
+                    this.$refs['modal-users-creation'].hide();
+                });
+
+            },
+            onUpdationShow() {
+                $('form[name="users.updation"]').fill(this.currentRow);
+            },
+            onUpdationSubmit(form) {
+                if (!this.currentRow.id) {
+                    return;
+                }
+
+                let obj = $(form).serializeJSON();
+                obj = dataDiff(obj, this.currentRow);
+
+                if (!obj.password) {
+                    delete obj.password;
+                }
+
+
+                axios.put(`./data/${this.currentRow.id}`, obj).then((ret) => {
+                    const msg = ret.data;
+
+
+                    if (msg.code === 422) {
+                        $.addErrorStates(form, msg.data.errors);
+                        return apperror(msg.msg);
+                    } else if (msg.code > 0) {
+                        return apperror(msg.msg);
+                    }
+
+                    this.$refs.grid.api.deselectAll();
+                    this.$refs.grid.pager.loadPage();
+                    this.$refs['modal-users-updation'].hide();
+                });
+            }
+        }
+    }
+</script>

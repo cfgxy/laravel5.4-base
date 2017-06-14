@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd /var/www
+
+if [[ ! -f /root/.app_laravel_inited ]]; then
+  exit
+fi
+
+./artisan config:cache
+
+if [[ "$APP_ROLE" == "queue_daemon" ]]; then
+  ./artisan queue:restart
+  sudo -u www-data ./artisan queue:work --tries=1 redis &
+fi

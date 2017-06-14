@@ -1,0 +1,7 @@
+# 此处定义私有 git 服务器( 若有)
+# 同时 ssh_known_hosts 要正确
+
+Host git
+HostName 11.11.11.11
+Port 22
+User git
