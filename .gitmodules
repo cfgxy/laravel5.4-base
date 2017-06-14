@@ -1,3 +1,0 @@
-[submodule "plugins/guxy-common"]
-	path = plugins/guxy-common
-	url = git@github.lab:cfgxy/guxy-common.git
