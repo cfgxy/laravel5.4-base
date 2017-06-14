@@ -21,7 +21,7 @@
 -------------
 1. 从此项目 fork (派生) 新的项目
 2. git clone 新项目到本地
-3. cp .env.sample .env
+3. cp .env.example .env
 4. 执行 git submodule init, git submodule update
 5. 执行 ./artisan  key:generate; 为项目生成新的密钥
 6. 修改本地 hosts; 添加  127.0.0.1   redis rabbitmq mysql docker redis-server
