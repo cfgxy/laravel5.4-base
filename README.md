@@ -6,6 +6,14 @@
 3. AdminLTE 后台(已做国内 CDN 优化)
 4. 简单登录页面/角色权限控制
 5. Vue 前端可重用组件(列表/分页/弹窗/提示)
+6. 基于jsvalidation前后端统一表单验证流程
+7. 集成常用的第三方高分扩展: 
+   * "barryvdh/laravel-debugbar"
+   * "barryvdh/laravel-ide-helper"
+   * "filp/whoops"
+   * "hipsterjazzbo/landlord"
+   * "maatwebsite/excel"
+   * "proengsoft/laravel-jsvalidation"
 
 
 
