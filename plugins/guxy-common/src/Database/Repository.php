@@ -9,8 +9,6 @@
 namespace Guxy\Common\Database;
 
 
-use Guxy\Common\Core\QArray;
-use Guxy\Common\Features\Auth\Model\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -469,9 +467,9 @@ abstract class Repository
         $p->setAccessible(true);
 
         if ($p->getValue($model) === 'int') {
-            $ids = QArray::make($ids)->map(function($v) {
+            $ids = collect($ids)->map(function($v) {
                 return (int)$v;
-            })->asArray();
+            })->all();
         }
 
 
