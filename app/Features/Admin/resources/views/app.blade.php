@@ -26,7 +26,7 @@
     <![endif]-->
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-<div id="app" class="wrapper guxy-app">
+<div id="app" class="guxy-app">
 
     <header class="main-header">
         <app-logo></app-logo>

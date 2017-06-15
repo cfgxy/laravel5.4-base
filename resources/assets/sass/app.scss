@@ -16,6 +16,18 @@
 @import "resources/assets/sass/basic";
 @import "resources/assets/sass/appalert";
 
+
+:focus {
+  outline:none;
+}
+
+.ag-cell {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 .content-wrapper .content {
   min-height: 600px;
 }
@@ -375,43 +387,14 @@
       display: inline-block;
     }
 
-    .ag-paging-panel {
-      display: none;
+    .ag-header-select-all {
+      padding-top: 13px;
+      padding-left: 12px;
+      display: inline-block;
     }
 
-    .ag-menu {
-      left: auto !important;
-      right: -1px;
-      top: 39px !important;
-      height: auto;
-      background-color: $flex-table-header-color;
-      border-color: $flex-table-border-color;
-
-      .ag-menu-column-select-wrapper {
-        width: auto;
-        height: auto;
-      }
-      .ag-tab-header {
-        display: none;
-      }
-
-      .ag-column-select-column {
-        display: inline-block;
-        padding-top: 3px;
-        padding-bottom: 3px;
-        margin-left: 0px;
-        padding-right: 10px;
-        padding-left: 5px;
-      }
-
-      .ag-sel-all {
-        display: block;
-        border-bottom: solid 1px $flex-table-border-color;
-      }
-
-      .ag-sel-all-text {
-        padding-right: 20px;
-      }
+    .ag-paging-panel {
+      display: none;
     }
 
   }

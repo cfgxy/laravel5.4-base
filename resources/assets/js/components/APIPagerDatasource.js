@@ -5,9 +5,10 @@ export class APIPagerDatasource
      * @param url
      * @param columns
      */
-    constructor(url, columns) {
+    constructor(url, columns, actions) {
         this.rowCount = 0;
         this.columnDefs = columns;
+        this.actionsDefs = _.isUndefined(actions) ? [] : actions;
         this.url = url;
         this.params = {};
         this.currentAjaxData = {};
@@ -19,12 +20,12 @@ export class APIPagerDatasource
         this.alwaysCallback = () => {};
     }
 
-    /**
-     * 获取表格标题栏
-     * @returns {*|Array}
-     */
     get columns() {
         return this.columnDefs || [];
+    }
+
+    get actions() {
+        return this.actionsDefs || [];
     }
 
     /**

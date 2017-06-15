@@ -66,12 +66,12 @@ class ResourceController extends Controller
     {
         $data = $request->validationData();
 
-        $user = new User();
-        $user->fill(guxy_mask($data, ['name', 'email', 'role']));
-        $user->password = bcrypt($data['password']);
+        $model = new User();
+        $model->fill(guxy_mask($data, ['name', 'email', 'role']));
+        $model->password = bcrypt($data['password']);
 
-        \DB::transaction(function() use ($user) {
-            $user->save();
+        \DB::transaction(function() use ($model) {
+            $model->save();
         });
 
         return guxy_json_message('ok');
@@ -102,16 +102,16 @@ class ResourceController extends Controller
         }
 
 
-        $user = User::repository()->findOneById($request->id);
+        $model = User::repository()->findOneById($request->id);
 
-        if (!$user) {
-            throw new AppException('用户不存在', 1);
+        if (!$model) {
+            throw new AppException('对象不存在', 1);
         }
 
-        $user->fill($data);
+        $model->fill($data);
 
-        \DB::transaction(function() use ($user) {
-            $user->save();
+        \DB::transaction(function() use ($model) {
+            $model->save();
         });
 
         return guxy_json_message('ok');

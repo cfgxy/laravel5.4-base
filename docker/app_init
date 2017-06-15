@@ -1,6 +1,8 @@
 #!/bin/sh
 
 cd /var/www
+#ln -s /data/uploads storage/app/public
+#ln -s /data/secured storage/secured
 chmod 777 -R storage bootstrap/cache
 
 cp .env.prod .env

@@ -49,6 +49,10 @@ class MyController extends Controller
 
         $avatar = \Session::remove('user.pending_avatar');
         if (@$data['avatar_ver'] && $avatar) {
+            $dir = dirname($user->avatar_path);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
             file_put_contents($user->avatar_path, base64_decode($avatar));
         }
 

@@ -18,6 +18,9 @@ fi
 git pull
 cp .env.prod .env
 
+git submodule init
+git submodule update
+
 
 if [[ $NEED_CC -gt 0 ]]; then
   ./artisan config:cache 

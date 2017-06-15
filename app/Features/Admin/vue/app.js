@@ -21,6 +21,13 @@ window.startApp = function(options) {
         options.router = new VueRouter({
             routes: options.routes
         });
+        options.router.beforeEach((to, from, next) => {
+            next();
+            
+            setTimeout(function() {
+                $('body').layout('fix');
+            }, 50);
+        });
 
         delete options.routes;
     }
