@@ -15,3 +15,4 @@ Route::group(['as' => 'site.'], function () {
     Route::get('', ['uses' => 'SiteController@index', 'as' => 'index']);
 });
 
+\App\Lib\SiteUtils::exportTemplateRoutes('web');

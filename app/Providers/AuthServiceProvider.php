@@ -26,7 +26,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        \Auth::provider('admin', function() {
+        \Auth::provider('guxy.user_provider', function() {
             return new UserProvider();
         });
     }

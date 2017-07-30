@@ -392,9 +392,17 @@ abstract class Repository
             $builder->with($options['with']);
         }
 
+
         if (@$options['joins']) {
+            $prefix = $builder->getConnection()->getTablePrefix();
             foreach ($options['joins'] as $j) {
-                $builder->join(\DB::raw($j->right), $j->on, null, null, $j->type, $where = false);
+                $arrRight = explode(" ", $j->right);
+                if ($prefix && count($arrRight) == 2) {
+                    $right = "{$prefix}{$arrRight[0]} {$prefix}{$arrRight[1]}";
+                } else {
+                    $right = $j->right;
+                }
+                $builder->join(\DB::raw($right), $j->on, null, null, $j->type, $where = false);
             }
         }
 

@@ -25,10 +25,6 @@ class CreationRequest extends ActionRequest
         return [
             'name'      => 'required|between:2,16',
             'email'     => "required|email|unique:users|max:64",
-            'role'      => [
-                "required",
-                Rule::in(UserRole::listKeys())
-            ],
             'password'  => 'required|between:6,16|confirmed'
         ];
     }

@@ -10,6 +10,8 @@ use Proengsoft\JsValidation\Javascript\MessageParser;
 use Proengsoft\JsValidation\Support\DelegatedValidator;
 use Proengsoft\JsValidation\Javascript\ValidatorHandler;
 use Proengsoft\JsValidation\Javascript\JavascriptValidator;
+use Proengsoft\JsValidation\Support\ValidationRuleParserProxy;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 class JsValidatorFactory
 {
@@ -58,7 +60,7 @@ class JsValidatorFactory
      *
      * @return JavascriptValidator
      */
-    public function make(array $rules, array $messages = array(), array $customAttributes = array(), $selector = null)
+    public function make(array $rules, array $messages = [], array $customAttributes = [], $selector = null)
     {
         $validator = $this->getValidatorInstance($rules, $messages, $customAttributes);
 
@@ -73,9 +75,9 @@ class JsValidatorFactory
      * @param array $customAttributes
      * @return Validator
      */
-    protected function getValidatorInstance(array $rules, array $messages = array(), array $customAttributes = array())
+    protected function getValidatorInstance(array $rules, array $messages = [], array $customAttributes = [])
     {
-        $factory = $this->app->make('Illuminate\Contracts\Validation\Factory');
+        $factory = $this->app->make(ValidationFactory::class);
 
         $data = $this->getValidationData($rules, $customAttributes);
         $validator = $factory->make($data, $rules, $messages, $customAttributes);
@@ -101,7 +103,7 @@ class JsValidatorFactory
             Arr::set($data, $attribute, true);
 
             return $data;
-        }, array());
+        }, []);
 
         return $data;
     }
@@ -159,7 +161,6 @@ class JsValidatorFactory
         if ($session = $request->getSession()) {
             $formRequest->setLaravelSession($session);
         }
-
         $formRequest->setUserResolver($request->getUserResolver());
         $formRequest->setRouteResolver($request->getRouteResolver());
         $formRequest->setContainer($this->app);
@@ -195,7 +196,7 @@ class JsValidatorFactory
         $view = $this->options['view'];
         $selector = is_null($selector) ? $this->options['form_selector'] : $selector;
 
-        $delegated = new DelegatedValidator($validator);
+        $delegated = new DelegatedValidator($validator, new ValidationRuleParserProxy());
         $rules = new RuleParser($delegated, $this->getSessionToken());
         $messages = new MessageParser($delegated);
 

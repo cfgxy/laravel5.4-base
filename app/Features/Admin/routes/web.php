@@ -1,15 +1,16 @@
 <?php
 
+Route::get('login', ['uses' => 'AuthController@showLoginForm', 'as' => 'login']);
+Route::post('login', ['uses' => 'AuthController@login', 'as' => 'login']);
+Route::get('logout', ['uses' => 'AuthController@logout', 'as' => 'logout']);
+
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
-    Route::get('login', ['uses' => 'AuthController@showLoginForm', 'as' => 'login']);
-    Route::post('login', ['uses' => 'AuthController@login', 'as' => 'login']);
-    Route::get('logout', ['uses' => 'AuthController@logout', 'as' => 'logout']);
     Route::get('user_info', ['uses' => 'AuthController@loginInfo', 'as' => 'user_info']);
 });
 
 
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function() {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'role:admin'], function() {
     Route::get('', ['uses' => '\App\Http\Controllers\VueController@appPage', 'as' => 'index']);
 
 

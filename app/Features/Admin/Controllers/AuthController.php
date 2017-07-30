@@ -10,9 +10,8 @@ namespace App\Features\Admin\Controllers;
 
 
 use App\Http\Controllers\Controller;
-use App\Model\Enums\UserRole;
 use App\Model\UserLoginLog;
-use App\User;
+use App\Model\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -24,7 +23,7 @@ class AuthController extends Controller
 
     protected function guard()
     {
-        return \Auth::guard('admin');
+        return \Auth::guard();
     }
 
     public function username()
@@ -35,11 +34,6 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         return view('FT.admin::login');
-    }
-
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
     }
 
 
@@ -75,7 +69,8 @@ class AuthController extends Controller
         });
 
         return guxy_json_message([
-            'name'  => $user->name
+            'name'  => $user->name,
+            'url'   => $user->main_url
         ]);
     }
 
@@ -106,7 +101,7 @@ class AuthController extends Controller
                 'avatar'        => $user->avatar,
                 'avatar_small'  => $user->styledAvatar('small'),
                 'name'          => $user->name,
-                'role'          => UserRole::display($user->role),
+                'role'          => $user->roles->map->display_name->implode(','),
                 'last_login'    => $log->logon_at->format('Y-m-d H:i:s'),
 
                 'messages'      => [

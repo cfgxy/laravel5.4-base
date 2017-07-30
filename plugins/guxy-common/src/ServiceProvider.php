@@ -84,6 +84,16 @@ namespace Guxy\Common {
                 $reader->addNamespace("Guxy\Common\Annotations");
                 return $reader;
             });
+
+            // 模块化拆分
+            $providers = glob(app_path('Features/*/ServiceProvider.php'));
+            sort($providers);
+
+            foreach ($providers as $provider) {
+                $provider = 'App' . substr($provider, strlen(app_path()), -4);
+                $provider = str_replace('/', '\\', ucfirst($provider));
+                $this->app->register($provider);
+            }
         }
     }
 

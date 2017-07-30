@@ -11,7 +11,7 @@ namespace App\Features\Admin\Controllers\Users;
 
 use App\Features\Admin\Requests\Users\UpdationRequest;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Model\User;
 use Illuminate\Http\Request;
 use Guxy\Common\Exceptions\AppException;
 

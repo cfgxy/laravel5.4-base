@@ -1,14 +1,26 @@
 #!/bin/bash
 
+declare -A roles
+for constant in $APP_ROLE
+do
+    roles[$constant]=1
+done
 if [[ ! -f /root/.app_laravel_inited ]]; then
   exit
 fi
 
 cd /var/www
+
+
+if [[ ${roles["queue_daemon"]} ]]; then
+  ./artisan schedule:run
+fi
+
+
 git fetch
-NEED_RELEASE=$(git diff master origin/master RELEASE_CODE|wc -l)
-NEED_CC=$(git diff master origin/master RELEASE_CODE|grep +CACHE_VERSION:|wc -l)
-NEED_CONSUMER_RESTART=$(git diff master origin/master RELEASE_CODE|grep +CONSUMER_VERSION:|wc -l)
+NEED_RELEASE=$(git diff $APP_GIT_BRANCH origin/$APP_GIT_BRANCH RELEASE_CODE|wc -l)
+NEED_CC=$(git diff $APP_GIT_BRANCH origin/$APP_GIT_BRANCH RELEASE_CODE|grep +CACHE_VERSION:|wc -l)
+NEED_CONSUMER_RESTART=$(git diff $APP_GIT_BRANCH origin/$APP_GIT_BRANCH RELEASE_CODE|grep +CONSUMER_VERSION:|wc -l)
 
 if [[ $NEED_RELEASE -lt 1 ]]; then
   echo 'No need release.';
@@ -28,10 +40,8 @@ if [[ $NEED_CC -gt 0 ]]; then
   ./artisan optimize
 fi
 
-#./artisan laravoole reload
-
 if [[ $NEED_CONSUMER_RESTART -gt 0 ]]; then
-  if [[ "$APP_ROLE" == "queue_daemon" ]]; then
+  if [[ ${roles["queue_daemon"]} ]]; then
     ./artisan queue:restart
     sudo -u www-data ./artisan queue:work --tries=1 redis &
   fi

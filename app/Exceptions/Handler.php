@@ -24,10 +24,15 @@ class Handler extends ExceptionHandler
 
     public function unauthenticated(Request $request, \Exception $ex)
     {
-        if (preg_match('@admin($|/)@', $request->path())) {
-            return redirect('admin/login');
+        if (!$request->routeIs('login')) {
+            if ($request->isXmlHttpRequest()) {
+                return guxy_json_message(trans('auth.unauth'), 401);
+            } else {
+                return redirect(route('login', [], false));
+            }
         }
 
-        return abort(403, 'Forbidden');
+
+        abort(404);
     }
 }

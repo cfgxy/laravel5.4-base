@@ -9,8 +9,7 @@
 namespace App\Features\Admin;
 
 
-use App\Model\Enums\UserRole;
-use App\User;
+use App\Model\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
 
@@ -37,9 +36,7 @@ class UserProvider implements \Illuminate\Contracts\Auth\UserProvider
      */
     public function retrieveById($identifier)
     {
-        $user = $this->repo->findOneById($identifier, [
-            'role'  => UserRole::ADMIN
-        ]);
+        $user = $this->repo->findOneById($identifier);
 
         return $user;
     }
@@ -54,7 +51,6 @@ class UserProvider implements \Illuminate\Contracts\Auth\UserProvider
     public function retrieveByToken($identifier, $token)
     {
         $user = $this->repo->findOneById($identifier, [
-            'role'  => UserRole::ADMIN,
             'remember_token' => $token
         ]);
 

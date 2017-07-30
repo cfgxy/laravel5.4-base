@@ -3,10 +3,11 @@
 namespace Proengsoft\JsValidation\Remote;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\ValidationRuleParser;
 use Proengsoft\JsValidation\Support\RuleListTrait;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Validator as BaseValidator;
-use Illuminate\Validation\ValidationRuleParser;
 use Proengsoft\JsValidation\Support\AccessProtectedTrait;
 
 /**
@@ -64,9 +65,10 @@ class Validator
     {
         $response = new JsonResponse($result, 200);
 
-        if ($result !== true && class_exists('\Illuminate\Validation\ValidationException')) {
-            throw new \Illuminate\Validation\ValidationException($validator, $response);
+        if ($result !== true && class_exists(ValidationException::class)) {
+            throw new ValidationException($validator, $response);
         }
+
         throw new HttpResponseException($response);
     }
 
@@ -137,7 +139,7 @@ class Validator
             return;
         }
         if (! $validateAll) {
-            $rules = $this->purgeNonRemoteRules($rules);
+            $rules = $this->purgeNonRemoteRules($rules, $validator);
         }
         $validator->setRules([$attribute => $rules]);
     }
@@ -146,10 +148,13 @@ class Validator
      * Remove rules that should not be validated remotely.
      *
      * @param $rules
+     * @param BaseValidator $validator
      * @return mixed
      */
-    protected function purgeNonRemoteRules($rules)
+    protected function purgeNonRemoteRules($rules, $validator)
     {
+        $protectedValidator = $this->createProtectedCaller($validator);
+
         foreach ($rules as $i => $rule) {
             $parsedRule = ValidationRuleParser::parse([$rule]);
             if (! $this->isRemoteRule($parsedRule[0])) {

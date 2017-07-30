@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta name="app-perms" content="guest" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>激活会员卡</title>
+    <link rel="stylesheet" href="../../dist/weui/weui.min.css"/>
+    <link rel="stylesheet" href="../../dist/weui/page.min.css"/>
+</head>
+<body ontouchstart>
+
+<div class="weui-toptips weui-toptips_warn js_tooltips  hidden">错误提示</div>
+
+<div class="container" id="container"></div>
+
+<script type="text/html" id="tpl_home">
+    <div class="page">
+        <div class="page__hd">
+            <h1 class="page__title">绑定老会员</h1>
+            <p class="page__desc">输入老会员卡绑定的手机号，验证会员身份</p>
+        </div>
+        <div class="page__bd">
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell weui-cell_vcode">
+                    <div class="weui-cell__hd">
+                        <label class="weui-label">手机号</label>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <input id="mobile" class="weui-input" type="tel" placeholder="请输入手机号"/>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <button id="btn-send-code" class="weui-vcode-btn">获取验证码<i class="hidden" style="font-style: normal;"> (60)</i></button>
+                    </div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+                    <div class="weui-cell__bd">
+                        <input id="captcha" class="weui-input" type="number" placeholder="请输入验证码"/>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <i class="weui-icon-warn"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weui-btn-area">
+                <a class="weui-btn weui-btn_primary weui-btn_loading" href="javascript:" id="btn-bind">
+                    <i class="weui-loading hidden" id="btn-bind-loading"></i>
+                    绑定
+                </a>
+            </div>
+        </div>
+        <div class="page__ft">
+            <img src="../../dist/weui/images/icon_footer.png" />
+            <div style="text-align: center; color: #d7d7d7; font-size: 12px;">XXX提供技术支持</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function(){
+            template.defaults.rules[1].test = /{%([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*%}/;
+
+            var $btn_bind_loading = $('#btn-bind-loading');
+            var tplCountdown = template.compile(' ({%countdown%})');
+
+            $('#btn-send-code').on('click', function() {
+                var $countdown = $('i', this);
+                if (!$countdown.hasClass('hidden')) return;
+
+
+                var mobile = $('#mobile').val();
+                $('.weui-cell_warn').removeClass('weui-cell_warn');
+
+                if (!mobile || !mobile.match(/^1[0-9]{10}$/)) {
+                    showtip('请输入正确的手机号');
+                    $('#mobile').closest('.weui-cell').addClass('weui-cell_warn');
+                    return;
+                }
+
+                axios.post(location.pathname, {
+                    act: 'send_code',
+                    mobile: mobile
+                }).then(function(resp) {
+                    var ret = resp.data;
+
+                    if (ret.code > 0) {
+                        $countdown.addClass('hidden');
+                        clearInterval(hCountdown);
+                        showtip(ret.msg);
+                        return;
+                    }
+                });
+
+                var data = {
+                    countdown: 60
+                };
+
+                var funcCountdown = function() {
+                    $countdown.removeClass('hidden').text(tplCountdown(data));
+                    data.countdown--;
+
+                    if (data.countdown < 0) {
+                        $countdown.addClass('hidden');
+                        clearInterval(hCountdown);
+                    }
+                };
+
+                var hCountdown = setInterval(funcCountdown, 1000);
+                funcCountdown();
+            });
+
+            $('#btn-bind').on('click', function(){
+                if (!$btn_bind_loading.hasClass('hidden')) return;
+
+
+                var mobile = $('#mobile').val();
+                var captcha = $('#captcha').val();
+
+                $('.weui-cell_warn').removeClass('weui-cell_warn');
+
+                if (!mobile || !mobile.match(/^1[0-9]{10}$/)) {
+                    showtip('请输入正确的手机号');
+                    $('#mobile').closest('.weui-cell').addClass('weui-cell_warn');
+                    return;
+                }
+
+                if (!captcha || !captcha.match(/^[0-9]{6}$/)) {
+                    showtip('请输入正确的验证码');
+                    $('#captcha').closest('.weui-cell').addClass('weui-cell_warn');
+                    return;
+                }
+
+
+
+                $btn_bind_loading.removeClass('hidden');
+
+                axios.post(location.pathname, {
+                    mobile: mobile,
+                    captcha: captcha,
+                    card_id: query_param('card_id'),
+                    encrypt_code: query_param('encrypt_code'),
+                    openid:  query_param('openid')
+                }).then(function(resp) {
+                    var ret = resp.data;
+                    $btn_bind_loading.addClass('hidden');
+
+                    if (ret.code > 0) {
+                        showtip(ret.msg);
+                        return;
+                    }
+
+                    WeixinJSBridge && WeixinJSBridge.invoke('closeWindow');
+                });
+
+
+            });
+        });
+</script>
+</script>
+
+<script>
+function onpagepreload() {
+}
+
+function onpagejsapi() {
+
+}
+
+function query_param(name) {
+    var reg = new RegExp('[?&]' + name + '=([^&=]+)');
+    var val = location.search.match(reg);
+    if (!val) {
+        return null;
+    }
+
+    return decodeURIComponent(val[1]);
+}
+
+function showtip(msg) {
+    var $tooltips = $('.js_tooltips');
+    $tooltips.removeClass('hidden');
+    $tooltips.text(msg);
+    setTimeout(function () {
+        $tooltips.addClass('hidden');
+    }, 2000);
+}
+
+</script>
+
+<script src="../../dist/zepto.min.js"></script>
+<script src="../../dist/axios.min.js"></script>
+<script src="../../dist/weui/weui.min.js"></script>
+<script src="../../dist/template-web.min.js"></script>
+<script src="../../dist/weui/app.js"></script>
+
+
+
+</body>
+</html>

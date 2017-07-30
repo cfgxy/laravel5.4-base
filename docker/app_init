@@ -6,6 +6,9 @@ cd /var/www
 chmod 777 -R storage bootstrap/cache
 
 cp .env.prod .env
+git submodule init
+git submodule update
+
 ./artisan config:cache
 ./artisan route:cache
 ./artisan optimize

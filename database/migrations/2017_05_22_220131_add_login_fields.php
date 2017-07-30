@@ -14,7 +14,6 @@ class AddLoginFields extends Migration
     public function up()
     {
         \Schema::table('users', function (Blueprint $table) {
-            $table->char('role', 16);
             $table->integer('avatar_ver')->default(0);
         });
 
@@ -34,7 +33,7 @@ class AddLoginFields extends Migration
     public function down()
     {
         \Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+            $table->dropColumn('avatar_ver');
         });
         \Schema::drop('user_login_logs');
     }

@@ -12,7 +12,7 @@ use Guxy\Common\ExEnum;
 
 
 /**
- * 后台任务运行状态
+ * Enum演示
  *
  * @Enum({"ADMIN",  "管理员"})
  * @Enum({"MEMBER", "会员"})

@@ -13,7 +13,7 @@ use App\Features\Admin\Requests\Users\CreationRequest;
 use App\Features\Admin\Requests\Users\UpdationRequest;
 use App\Http\Controllers\Controller;
 use App\Model\Enums\UserRole;
-use App\User;
+use App\Model\User;
 use Guxy\Common\Exceptions\AppException;
 use Guxy\Common\Database\Limiter;
 use Guxy\Common\Requests\DefaultDestroyRequest;
@@ -52,12 +52,11 @@ class ResourceController extends Controller
             'page'      => $params['page'],
             'size'      => $params['size'],
             'orderby'   => $params['orderby'],
-            'joins'     => $joiners
+            'joins'     => $joiners,
+            'with'      => ['roles']
         ]);
 
-        $pager->_extras = [
-            'roles' => UserRole::lists()
-        ];
+        guxy_make_visible($pager, ['roles']);
 
         return guxy_json_message($pager, 0);
     }

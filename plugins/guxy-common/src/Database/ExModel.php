@@ -19,6 +19,7 @@ trait ExModel
 
     protected $tenantColumns = [];
     protected $_pending_incrs = [];
+    protected $_dirty_marks = [];
 
 
     protected $compute_cache = [];
@@ -28,17 +29,24 @@ trait ExModel
      */
     public static function bootExModel()
     {
-        static::updating(function (Model $model) {
-            $model->setAttributes($model->_pending_incrs);
+        static::saving(function (Model $model) {
+            if ($model->_pending_incrs) {
+                $model->setAttributes($model->_pending_incrs);
+            }
         }, -10);
 
-        static::updated(function (Model $model) {
-            foreach ($model->_pending_incrs as $field => $expr) {
-                $model->setAttribute($field, $expr->_oldVal + $expr->_incr);
-                $model->syncOriginalAttribute($field);
+        static::saved(function (Model $model) {
+            if ($model->_pending_incrs) {
+                foreach ($model->_pending_incrs as $field => $expr) {
+                    $model->setAttribute($field, $expr->_oldVal + $expr->_incr);
+                    $model->syncOriginalAttribute($field);
+                }
+                $model->refresh();
+                $model->_pending_incrs = [];
             }
-
-            $model->_pending_incrs = [];
+            if ($model->_dirty_marks) {
+                $model->_dirty_marks = [];
+            }
         }, 10);
     }
 
@@ -218,5 +226,20 @@ trait ExModel
         $this->_pending_incrs[$field] = $expr;
         $this->setAttribute($field, $oldVal + $incr);
         $this->syncOriginalAttribute($field);
+
+        if (!$this->getDirty()) {
+            $this->markDirty('updated_at');
+        }
+    }
+
+    public function getDirty()
+    {
+        $dirties = parent::getDirty();
+        return array_replace($this->_dirty_marks, $dirties);
+    }
+
+    public function markDirty($field)
+    {
+        $this->_dirty_marks[$field] = $this->$field;
     }
 }
