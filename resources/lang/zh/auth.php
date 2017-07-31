@@ -15,5 +15,7 @@ return [
 
     'failed' => '用户名/密码不正确',
     'throttle' => '登录失败次数太多, :seconds 秒后重试',
+    'nologin' => '请登录',
+    'unauth' => 'Unauthenticated.'
 
 ];

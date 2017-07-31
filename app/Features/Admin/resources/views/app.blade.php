@@ -9,20 +9,21 @@
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="/css/app.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/dist/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="//cdn.staticfile.org/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="/dist/ionicons/css/ionicons.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="/dist/adminlte/css/AdminLTE.min.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="/dist/adminlte/css/skins/skin-blue.min.css">
+    <link rel="stylesheet" href="/dist/bootstrap/daterangepicker.css" />
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-    <script src="//cdn.staticfile.org/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="//cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <script src="/dist/html5shiv.min.js"></script>
+    <script src="/dist/respond.min.js"></script>
     <![endif]-->
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -67,12 +68,20 @@
 
 
 <script type="text/javascript" src="/js/{{$package}}/app.js"></script>
+<script type="text/javascript" src="/dist/bootstrap/moment-with-locales.min.js"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script type="text/javascript" src="/dist/bootstrap/daterangepicker.js"></script>
+<script type="text/javascript" src="/dist/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="/dist/ueditor/ueditor.all.min.js"></script>
+
 <!-- FastClick -->
-<script src="//cdn.staticfile.org/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="/dist/fastclick.min.js"></script>
 <!-- AdminLTE App -->
 <script src="/dist/adminlte/js/adminlte.js"></script>
 <!-- SlimScroll 1.3.0 -->
-<script src="//cdn.staticfile.org/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js"></script>
+<script src="/dist/jquery.slimscroll.min.js"></script>
 <script type="text/javascript" src="{{ asset('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
 {!! include_module_validators('admin', $page == 'index' ? '' : $page) !!}
 

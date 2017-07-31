@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html >
+<head>
+    <meta name="app-perms" content="guest" />
+    <meta charset="UTF-8">
+    <title>Animated login form</title>
+    <link href='../dist/font-opensans/css.css' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../dist/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../dist/normalize.css">
+    <link rel="stylesheet" href="../css/admin/login.css">
+
+    <script src="../dist/prefixfree.min.js"></script>
+
+</head>
+
+<body>
+<div class="wrapper">
+    <form class="login">
+        <p class="title">Log in</p>
+        <input name="email" type="text" placeholder="用户名" autofocus/>
+        <i class="fa fa-user"></i>
+        <input name="password" type="password" placeholder="密码" />
+        <i class="fa fa-key"></i>
+        <button>
+            <i class="spinner"></i>
+            <span class="state">登录</span>
+        </button>
+    </form>
+</div>
+<script src="../js/admin/login.js"></script>
+
+</body>
+</html>

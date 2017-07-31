@@ -33,6 +33,20 @@ class User extends Authenticatable
         'id', 'name', 'email', 'created_at', 'updated_at',
     ];
 
+
+    public function getMainUrlAttribute()
+    {
+        if ($this->hasRole('admin')) {
+            $url = '/admin';
+        } elseif ($this->hasRole('merchant')) {
+            $url = '/merchant';
+        } else {
+            $url = '/';
+        }
+
+        return $url;
+    }
+
     public function getAvatarAttribute()
     {
         $encid = guxy_encrypt($this->id);

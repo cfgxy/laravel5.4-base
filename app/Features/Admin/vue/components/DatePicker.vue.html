@@ -1,0 +1,101 @@
+<template>
+    <div class="input-group" >
+        <div class="input-group-addon">
+            <i class="fa fa-calendar"></i>
+        </div>
+        <input class="form-control" :name.once="fieldName" type="text" placeholder="" />
+    </div>
+</template>
+
+
+<script>
+    export default {
+        props: {
+            fieldName: String,
+            range: {
+                type: Boolean,
+                default: false
+            },
+            start: String,
+            end: String,
+            opens: {
+                type: String,
+                default: 'left'
+            },
+            drops: {
+                type: String,
+                default: 'down'
+            },
+            format: {
+                type: String,
+                default: 'YYYY/MM/DD'
+            },
+            separator: {
+                type: String,
+                default: ' - '
+            },
+            quick: {
+                type: Boolean,
+                default: true
+            },
+            limit: {
+                type: Object,
+                default: () => {return {};}
+            }
+        },
+
+        mounted() {
+            let cont = this;
+
+            let current = '';
+            if (this.start) {
+                let end = this.end;
+                if (!end) {
+                    end = moment().format(this.format);
+                }
+                current = [this.start, end].join(this.separator);
+            }
+
+            let maxDate = this.limit && this.limit.maxDate || false;
+            let minDate = this.limit && this.limit.minDate || false;
+
+            delete this.limit.maxDate;
+            delete this.limit.minDate;
+
+            $('input', this.$el).daterangepicker({
+                "autoUpdateInput": false,
+                "opens": this.opens,
+                "drops": this.drops,
+                "singleDatePicker": !this.range,
+                "linkedCalendars": false,
+                "timePicker24Hour": true,
+                "timePicker": /[Hm]/.test(this.format),
+                "startDate": this.start,
+                "endDate": this.end,
+                "minDate": minDate,
+                "maxDate": maxDate,
+                "dateLimit": _.size(this.limit) && this.limit || false,
+                "ranges": this.quick && {
+                    "现在": [moment(), moment()],
+                    "今天": [moment().startOf('day'), moment().endOf('day')],
+                    "昨天": [moment().startOf('day').subtract(1, 'days'), moment().endOf('day').subtract(1, 'days')],
+                    "近7天": [moment().startOf('day').subtract(6, 'days'), moment().endOf('day')],
+                    "近30天": [moment().startOf('day').subtract(29, 'days'), moment().endOf('day')],
+                    "本周": [moment().startOf('week'), moment().endOf('week')],
+                    "上周": [moment().startOf('week').subtract(1, 'weeks'), moment().endOf('week').subtract(1, 'weeks')],
+                    "本月": [moment().startOf('month'), moment().endOf('months')],
+                    "上月": [moment().startOf('month').subtract(1, 'months'), moment().endOf('month').subtract(1, 'months')]
+                },
+                "locale": {
+                    "format": this.format,
+                    "separator": this.separator,
+                    "firstDay": 1
+                }
+            }).val(current).on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format(cont.format) + cont.separator + picker.endDate.format(cont.format));
+            }).on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+            });
+        }
+    }
+</script>

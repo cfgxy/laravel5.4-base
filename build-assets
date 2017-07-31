@@ -1,5 +1,5 @@
 #!/bin/sh
-rm -rf public/dist public/images public/css public/fonts public/js public/static public/mix-manifest.json public/mix.js
+rm -rf public/images public/css public/fonts public/js public/static public/mix-manifest.json public/mix.js
 mkdir public/images public/css public/fonts public/js public/static
 yarn run production
 

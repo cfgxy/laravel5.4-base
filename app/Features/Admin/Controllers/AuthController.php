@@ -12,7 +12,6 @@ namespace App\Features\Admin\Controllers;
 use App\Http\Controllers\Controller;
 use App\Model\UserLoginLog;
 use App\Model\User;
-use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Guxy\Common\Exceptions\AppException;
@@ -30,12 +29,6 @@ class AuthController extends Controller
     {
         return 'email';
     }
-
-    public function showLoginForm()
-    {
-        return view('FT.admin::login');
-    }
-
 
     /**
      * Get the failed login response instance.

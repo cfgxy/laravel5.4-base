@@ -1,0 +1,97 @@
+<template>
+    <panel>
+
+        <span slot="title">
+             用户管理
+        </span>
+
+        <div slot="body">
+            <div class="row">
+                <div class="col-md-5">
+                    <h4 class="guxy-title">
+                        <button type="button" class="btn btn-app-mid btn-app-red btn-sm" @click="onAdd">新增</button>
+                    </h4>
+                </div>
+                <div class="col-md-5 pull-right">
+                    <search-bar id="searchbar1" class="mt5" @search="onSearch">
+                    </search-bar>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <flex-table id="sample" :dataSource="ds" height="450px" ref="grid" @row-action="onRowAction"></flex-table>
+                </div>
+            </div>
+        </div>
+
+
+        <div slot="extras">
+        </div>
+    </panel>
+
+</template>
+
+<script>
+
+    export default {
+        data() {
+            return {
+                ds: new APIPagerDatasource('./data', [
+                    {headerName: "ID", field: "id", width:120},
+                    {headerName: "标题", field: "title"},
+                    {headerName: "创建日期", width: 150, field: "created_at"}
+                ], [
+                    {name: 'act1', label: '动作1', icon: 'fa-bookmark', url: '/admin/news/#/edit/{{id}}'}
+                ]).ajaxData((data) => {
+                    return _.defaults({show_all: this.showAll}, data, this.searchParams)
+                }).success((ret) => {
+                    this.extras = ret.data.extras;
+                }),
+                searchParams: {},
+                showAll: false,
+                currentRow: {},
+                extras: {},
+                breadcrum: [
+                    appDashboardBreadcrumItem,
+                    makeAppBreadcrum('用户管理', `./#${this.$route.path}`, 'fa-user')
+                ]
+            }
+        },
+        methods: {
+            onSearch(params) {
+                this.searchParams = params.data;
+                this.$refs.grid.pager.loadPage();
+            },
+            onAdd() {
+                location.href = '#/create';
+            },
+            onDelete() {
+                const ids = _.map(this.$refs.grid.api.getSelectedRows(), 'id');
+                if (!ids.length) {
+                    apptoast('请勾选需要删除的项');
+                    return;
+                }
+
+                appconfirm(`将要删除${ids.length}条记录,是否继续?`, () => {
+                    axios.delete('./data/selected', {
+                        'params': {ids}
+                    }).then((ret) => {
+                        const msg = ret.data;
+
+                        if (msg.code > 0) {
+                            apperror(msg.msg);
+                            return;
+                        } else {
+                            appsuccess(msg.msg);
+                        }
+                        this.$refs.grid.api.deselectAll();
+                        this.$refs.grid.pager.loadPage();
+                    });
+                });
+            },
+			onRowAction(act, row) {
+			  alert(act.name);
+			}
+        }
+    }
+</script>

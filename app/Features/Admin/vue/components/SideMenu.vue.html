@@ -2,7 +2,7 @@
     <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
         <li class="treeview">
-            <a href="#">
+            <a @click="noop">
                 <i class="fa fa-dashboard"></i> <span>系统管理</span>
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
@@ -16,14 +16,25 @@
         <li><a href="/admin/apps/#/"><i class="fa fa-calculator"></i> <span>业务管理</span></a></li>
         <li><a href="/admin/merchants/#/"><i class="fa fa-shopping-bag"></i> <span>商户管理</span></a></li>
         <li><a href="/admin/tasks/#/"><i class="fa fa-tasks "></i> <span>任务管理</span></a></li>
+        <li><a href="/admin/news/#/"><i class="fa fa-tasks "></i> <span>新闻管理</span></a></li>
     </ul>
 </template>
 
 <script>
     export default {
         mounted() {
+            $('a[href]', this.$el).click(function() {
+                $('.active').removeClass('active');
+                $('.menu-open').removeClass('menu-open');
+                $(this).parents('li').addClass('active').addClass('menu-open');
+            });
+
             const url = window.location.pathname + window.location.hash;
-            $(`a[href="${url}"]`).parents('li').addClass('active');
+            const $link = $(`a[href="${url}"]`, this.$el);
+            $link.trigger('click');
+        },
+        methods: {
+            noop() {return false;}
         }
     }
 </script>

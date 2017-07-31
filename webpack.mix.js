@@ -55,26 +55,3 @@ glob.sync('app/Features/*/resources/assets/js/*.js').forEach(function (file) {
     const pubpath = `public/js/${module}/${fileName}`;
     mix.js(file, pubpath);
 });
-
-//Create public/dist
-if (!fs.existsSync(`public/dist`)) {
-    fs.mkdirSync(`public/dist`);
-}
-
-//The root dists
-glob.sync('resources/assets/dist/*').forEach(function (file) {
-    const name = path.basename(file);
-
-    if (!fs.existsSync(`public/dist/${name}`)) {
-        fs.symlinkSync(`../../${file}`, `public/dist/${name}`, 'dir');
-    }
-});
-
-//The module dists
-glob.sync('app/Features/*/resources/assets/dist/*').forEach(function (file) {
-    const name = path.basename(file);
-
-    if (!fs.existsSync(`public/dist/${name}`)) {
-        fs.symlinkSync(`../../${file}`, `public/dist/${name}`, 'dir');
-    }
-});

@@ -4,6 +4,9 @@ import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
+
+Vue.component('datepicker', require('./components/DatePicker.vue.html'));
+
 window.appDashboardBreadcrumItem = {name: '首页', url: '/admin/#', icon: 'fa-dashboard'};
 window.makeAppBreadcrum = function(name, url, icon) {
     let obj = {name};

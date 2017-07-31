@@ -106,7 +106,10 @@
                     }
 
                     const id = $(`form *[name=${k}]`, this.$el).attr('id');
-                    var text = $(`form label[for=${id}]`, this.$el).text();
+                    let text = $(`form label[for=${id}]`, this.$el).text();
+                    if (!text) {
+                        text = $(`form *[name=${k}]`, this.$el).closest('.form-group').find('label').text();
+                    }
                     text = !text ? '' : `${text}: `;
 
                     if (this.filterParser[k]) {

@@ -16,7 +16,7 @@ $('.login').on('submit', function(e) {
 
     const data = $this.serializeJSON();
 
-    axios.post('./login', data).then((ret) => {
+    axios.post('/login', data).then((ret) => {
         const msg = ret.data;
         if (msg.code === 0) {
             $this.addClass('ok');
@@ -24,7 +24,7 @@ $('.login').on('submit', function(e) {
 
             setTimeout(function() {
                 working = false;
-                location.replace('/admin/#');
+                location.replace(msg.data.url);
             }, 600);
         } else {
             $state.html('登录');

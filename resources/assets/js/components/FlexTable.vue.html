@@ -87,10 +87,6 @@
             let actions = this.ds.actions;
 
             columns.forEach(function(e) {
-                if (!e.vis && (e.hide === undefined)) {
-                    e.hide = true;
-                }
-
                 if (e.width || e.minWidth || e.maxWidth) {
                     e.suppressSizeToFit = true;
                 }
@@ -191,6 +187,7 @@
                     this.ds.grid(this);
                     this.api.setDatasource(this.ds);
                     resizeHandler();
+                    resizing = setTimeout(resizeHandler, 500);
                 }
             };
 
