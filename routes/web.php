@@ -12,7 +12,7 @@
 */
 
 Route::group(['as' => 'site.'], function () {
-    Route::get('', ['uses' => 'SiteController@index', 'as' => 'index']);
+    Route::get('bladetest', ['uses' => 'SiteController@index', 'as' => 'index']);
 });
 
 \App\Lib\SiteUtils::exportTemplateRoutes(public_path('web'));

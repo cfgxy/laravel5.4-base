@@ -15,6 +15,9 @@ class SiteController extends Controller
 {
     public function index()
     {
-        return response('ok');
+        return view('bladetest', [
+            'a' => 1,
+            'b' => 2
+        ]);
     }
 }

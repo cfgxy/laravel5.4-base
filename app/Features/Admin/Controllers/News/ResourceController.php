@@ -12,6 +12,7 @@ namespace App\Features\Admin\Controllers\News;
 use App\Features\Admin\Requests\News\CreationRequest;
 use App\Features\Admin\Requests\News\UpdationRequest;
 use App\Http\Controllers\Controller;
+use App\Jobs\TestJob;
 use App\Model\News;
 use Guxy\Common\Exceptions\AppException;
 use Guxy\Common\Database\Limiter;
@@ -114,6 +115,9 @@ class ResourceController extends Controller
         \DB::transaction(function() use ($model) {
             $model->save();
         });
+
+
+        dispatch(new TestJob(['test' => 'muhaha']));
 
         return guxy_json_message('ok');
     }
